@@ -1,0 +1,14 @@
+[main]
+priority = 2001
+output = "example-output.tf"
+
+[zscaler.zpa]
+enabled = true
+url = "https://api.config.zscaler.com/zscaler.net/zpa/json"
+
+[zscaler.hub]
+enabled = true
+url = "https://config.zscaler.com/api/zscaler.net/hubs/cidr/json/recommended"
+
+[custom]
+enabled = false
