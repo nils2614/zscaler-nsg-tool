@@ -12,3 +12,8 @@ url = "https://config.zscaler.com/api/zscaler.net/hubs/cidr/json/recommended"
 
 [custom]
 enabled = false
+
+[resources]
+rgNameTf = "sase-dev-vnet"
+nsgNameTf = "sase-dev-whitelist"
+nsgNameAz = "nsg_restrict_outbound_zscaler"
