@@ -10,7 +10,7 @@ url = "https://api.config.zscaler.com/zscaler.net/zpa/json"
 enabled = true
 url = "https://config.zscaler.com/api/zscaler.net/hubs/cidr/json/recommended"
 
-[custom]
+[zscaler.custom]
 enabled = false
 
 [resources]
