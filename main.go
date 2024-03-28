@@ -55,7 +55,7 @@ type (
 
 	cfgZscalerCustom struct {
 		Enabled bool
-		Url     string
+		Ips     []string
 	}
 
 	cfgResources struct {
@@ -79,6 +79,6 @@ func main() {
 		}
 	}
 
-	// Test
-	fmt.Println(cfg.Zscaler.Custom.Enabled)
+	// Convert Interface customIpsTemp to slice of strings customIps
+	fmt.Println(cfg.Zscaler.Custom.Ips[0])
 }
