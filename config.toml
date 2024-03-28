@@ -23,6 +23,6 @@ ips = [ "30.80.175.75", "54.187.114.244", "54.149.72.202", "185.46.212.0/22", "1
     "147.161.152.0/23", "165.225.20.0/23" ]
 
 [resources]
-rgNameTf = "sase-dev-vnet"
-nsgNameTf = "sase-dev-whitelist"
+rgNameTf = "playground"
+nsgNameTf = "restrict_zscaler"
 nsgNameAz = "nsg_restrict_outbound_zscaler"
