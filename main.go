@@ -159,6 +159,7 @@ func appendHubRules(url string, priority *int) []string {
 			//*priority++
 		}
 	}
+	whitelistRules = generateSecurityRule("Test", *priority, "Outbound", "Allow", "*", "443", destinations)
 	fmt.Println(destinations)
 
 	return whitelistRules
@@ -178,15 +179,15 @@ func generateNsgDefinition(rgNameTf string, nsgNameTf string, nsgNameAz string) 
 	NsgDefinition = append(NsgDefinition, "  dynamic \"security_rule\" {")
 	NsgDefinition = append(NsgDefinition, "    for_each = var.restrict_zscaler")
 	NsgDefinition = append(NsgDefinition, "    content {")
-	NsgDefinition = append(NsgDefinition, "      name                       = security_rule.value.name")
-	NsgDefinition = append(NsgDefinition, "      priority                   = security_rule.value.priority")
-	NsgDefinition = append(NsgDefinition, "      direction                  = security_rule.value.direction")
-	NsgDefinition = append(NsgDefinition, "      access                     = security_rule.value.access")
-	NsgDefinition = append(NsgDefinition, "      protocol                   = security_rule.value.protocol")
-	NsgDefinition = append(NsgDefinition, "      source_port_range          = security_rule.value.source_port_range")
-	NsgDefinition = append(NsgDefinition, "      destination_port_range     = security_rule.value.destination_port_range")
-	NsgDefinition = append(NsgDefinition, "      source_address_prefix      = security_rule.value.source_address_prefix")
-	NsgDefinition = append(NsgDefinition, "      destination_address_prefix = security_rule.value.destination_address_prefix")
+	NsgDefinition = append(NsgDefinition, "      name                         = security_rule.value.name")
+	NsgDefinition = append(NsgDefinition, "      priority                     = security_rule.value.priority")
+	NsgDefinition = append(NsgDefinition, "      direction                    = security_rule.value.direction")
+	NsgDefinition = append(NsgDefinition, "      access                       = security_rule.value.access")
+	NsgDefinition = append(NsgDefinition, "      protocol                     = security_rule.value.protocol")
+	NsgDefinition = append(NsgDefinition, "      source_port_range            = security_rule.value.source_port_range")
+	NsgDefinition = append(NsgDefinition, "      destination_port_range       = security_rule.value.destination_port_range")
+	NsgDefinition = append(NsgDefinition, "      source_address_prefix        = security_rule.value.source_address_prefix")
+	NsgDefinition = append(NsgDefinition, "      destination_address_prefixes = security_rule.value.destination_address_prefixes")
 	NsgDefinition = append(NsgDefinition, "    }")
 	NsgDefinition = append(NsgDefinition, "  }")
 
@@ -204,15 +205,15 @@ func generateVarDefinition(nsgNameTf string) []string {
 	VarDefinition = append(VarDefinition, "variable \""+nsgNameTf+"\" {")
 	VarDefinition = append(VarDefinition, "  type = list(object({")
 
-	VarDefinition = append(VarDefinition, "    name                       = string")
-	VarDefinition = append(VarDefinition, "    priority                   = number")
-	VarDefinition = append(VarDefinition, "    direction                  = string")
-	VarDefinition = append(VarDefinition, "    access                     = string")
-	VarDefinition = append(VarDefinition, "    protocol                   = string")
-	VarDefinition = append(VarDefinition, "    source_port_range          = string")
-	VarDefinition = append(VarDefinition, "    destination_port_range     = string")
-	VarDefinition = append(VarDefinition, "    source_address_prefix      = string")
-	VarDefinition = append(VarDefinition, "    destination_address_prefix = string")
+	VarDefinition = append(VarDefinition, "    name                         = string")
+	VarDefinition = append(VarDefinition, "    priority                     = number")
+	VarDefinition = append(VarDefinition, "    direction                    = string")
+	VarDefinition = append(VarDefinition, "    access                       = string")
+	VarDefinition = append(VarDefinition, "    protocol                     = string")
+	VarDefinition = append(VarDefinition, "    source_port_range            = string")
+	VarDefinition = append(VarDefinition, "    destination_port_range       = string")
+	VarDefinition = append(VarDefinition, "    source_address_prefix        = string")
+	VarDefinition = append(VarDefinition, "    destination_address_prefixes = string")
 	VarDefinition = append(VarDefinition, "  }))")
 	VarDefinition = append(VarDefinition, "  description = \"Security rules for the "+nsgNameTf+" NSG\"")
 	VarDefinition = append(VarDefinition, "}")
@@ -220,18 +221,18 @@ func generateVarDefinition(nsgNameTf string) []string {
 	return VarDefinition
 }
 
-func generateSecurityRule(name string, priority int, direction string, access string, protocol string, port string, ip string) []string {
+func generateSecurityRule(name string, priority int, direction string, access string, protocol string, port string, ips string) []string {
 	var securityRule []string
 	securityRule = append(securityRule, "{")
-	securityRule = append(securityRule, "  name                       = \""+name+"\"")
-	securityRule = append(securityRule, "  priority                   = "+strconv.Itoa(priority))
-	securityRule = append(securityRule, "  direction                  = \""+direction+"\"")
-	securityRule = append(securityRule, "  access                     = \""+access+"\"")
-	securityRule = append(securityRule, "  protocol                   = \""+protocol+"\"")
-	securityRule = append(securityRule, "  source_port_range          = \"*\"")
-	securityRule = append(securityRule, "  destination_port_range     = \""+port+"\"")
-	securityRule = append(securityRule, "  source_address_prefix      = \"*\"")
-	securityRule = append(securityRule, "  destination_address_prefix = \""+ip+"\" #tfsec:ignore:azure-network-no-public-egress")
+	securityRule = append(securityRule, "  name                         = \""+name+"\"")
+	securityRule = append(securityRule, "  priority                     = "+strconv.Itoa(priority))
+	securityRule = append(securityRule, "  direction                    = \""+direction+"\"")
+	securityRule = append(securityRule, "  access                       = \""+access+"\"")
+	securityRule = append(securityRule, "  protocol                     = \""+protocol+"\"")
+	securityRule = append(securityRule, "  source_port_range            = \"*\"")
+	securityRule = append(securityRule, "  destination_port_range       = \""+port+"\"")
+	securityRule = append(securityRule, "  source_address_prefix        = \"*\"")
+	securityRule = append(securityRule, "  destination_address_prefixes = "+ips+" #tfsec:ignore:azure-network-no-public-egress")
 	securityRule = append(securityRule, "}")
 	return securityRule
 }
