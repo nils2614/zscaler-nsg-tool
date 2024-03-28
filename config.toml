@@ -1,6 +1,8 @@
 [main]
 priority = 2001
-output = "example-output.tf"
+outputNsg = "restrict_zscaler.tf"
+outputVars = "variables.tf"
+outputRules = "terraform.tfvars"
 
 [zscaler.zpa]
 enabled = true

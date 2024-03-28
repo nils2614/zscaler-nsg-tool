@@ -33,8 +33,10 @@ type (
 	}
 
 	cfgMain struct {
-		Priority int
-		Output   string
+		Priority    int
+		OutputNsg   string
+		OutputVars  string
+		OutputRules string
 	}
 
 	cfgZscaler struct {
@@ -79,6 +81,9 @@ func main() {
 		}
 	}
 
-	// Convert Interface customIpsTemp to slice of strings customIps
-	fmt.Println(cfg.Zscaler.Custom.Ips[0])
+	// Initialise slices to hold the output text
+	//var outputNsgText []string   // holds content for file cfg.Main.OutputNsg
+	//var outputVarsText []string  // holds content for file cfg.Main.OutputVars
+	//var outputRulesText []string // holds content for file cfg.Main.OutputText
+	fmt.Println(cfg.Main.OutputNsg)
 }
