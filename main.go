@@ -82,8 +82,32 @@ func main() {
 	}
 
 	// Initialise slices to hold the output text
-	//var outputNsgText []string   // holds content for file cfg.Main.OutputNsg
-	//var outputVarsText []string  // holds content for file cfg.Main.OutputVars
-	//var outputRulesText []string // holds content for file cfg.Main.OutputText
-	fmt.Println(cfg.Main.OutputNsg)
+	var outputNsgText []string   // holds content for file cfg.Main.OutputNsg
+	var outputVarsText []string  // holds content for file cfg.Main.OutputVars
+	var outputRulesText []string // holds content for file cfg.Main.OutputRules
+
+	writeToFile(outputNsgText, cfg.Main.OutputNsg)
+	writeToFile(outputVarsText, cfg.Main.OutputVars)
+	writeToFile(outputRulesText, cfg.Main.OutputRules)
+	fmt.Println("Terraform code successfully generated!")
+}
+
+func writeToFile(lines []string, filename string) {
+	file, err := os.Create(filename)
+	if err != nil {
+		fmt.Println("Error creating file on disk")
+	}
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			fmt.Println("Error closing file")
+		}
+	}(file)
+
+	for _, line := range lines {
+		_, err := file.WriteString(line + "\n")
+		if err != nil {
+			fmt.Println("Error writing to file on disk")
+		}
+	}
 }

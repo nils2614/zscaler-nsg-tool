@@ -14,8 +14,10 @@
 # Go workspace file
 go.work
 
-# Output Terrform file
-output.tf
+# Output Terrform files
+restrict_zscaler.tf
+terraform.tfvars
+variables.tf
 
 # GoLand
 .idea
