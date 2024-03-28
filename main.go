@@ -1,10 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/pelletier/go-toml/v2"
+	"io"
+	"net/http"
 	"os"
 	"strconv"
+	"strings"
 )
 
 // Struct to hold information from Zscaler API and config file
@@ -92,7 +96,11 @@ func main() {
 	outputVarsText = generateVarDefinition(cfg.Resources.NsgNameTf)
 
 	// Generate output for cfg.Main.OutputRules
-	fmt.Println("First priority: " + strconv.Itoa(cfg.Main.Priority))
+	currentPrio := cfg.Main.Priority
+	fmt.Println("First priority: " + strconv.Itoa(currentPrio))
+	if cfg.Zscaler.Hub.Enabled {
+		outputRulesText = append(outputRulesText, appendHubRules(cfg.Zscaler.Hub.Url, &currentPrio)...)
+	}
 
 	// Write to output files
 	writeToFile(outputNsgText, cfg.Main.OutputNsg)
@@ -100,6 +108,42 @@ func main() {
 	writeToFile(outputRulesText, cfg.Main.OutputRules)
 
 	fmt.Println("Terraform code successfully generated!")
+}
+
+func appendHubRules(url string, priority *int) []string {
+	// Request data and store body in var.body
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println("No response from request")
+	}
+
+	// Close ReadAll of resp.Body
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("Error closing body of data request")
+		}
+	}(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+
+	// Unmarshal JSON from var.body to struct.result
+	var result hubApi
+	if err := json.Unmarshal(body, &result); err != nil {
+		fmt.Println("Can not unmarshal JSON")
+	}
+
+	// Iterate over all IPs and append security rules for them (TCP and UDP)
+	var whitelistRules []string
+	fmt.Println("Rules are being generated for Zscaler Hub IPs")
+	for i := 0; i < len(result.HubPrefixes); i++ {
+		if isIPv4(result.HubPrefixes[i]) {
+			ruleName := "AllowZscaler-Hub" + "-" + strconv.Itoa(i+1)
+			whitelistRules = append(whitelistRules, generateSecurityRule(ruleName, *priority, "Outbound", "Allow", "*", "443", result.HubPrefixes[i])...)
+			*priority++
+		}
+	}
+
+	return whitelistRules
 }
 
 func generateNsgDefinition(rgNameTf string, nsgNameTf string, nsgNameAz string) []string {
@@ -158,6 +202,22 @@ func generateVarDefinition(nsgNameTf string) []string {
 	return VarDefinition
 }
 
+func generateSecurityRule(name string, priority int, direction string, access string, protocol string, port string, ip string) []string {
+	var securityRule []string
+	securityRule = append(securityRule, "{")
+	securityRule = append(securityRule, "  name                       = \""+name+"\"")
+	securityRule = append(securityRule, "  priority                   = "+strconv.Itoa(priority))
+	securityRule = append(securityRule, "  direction                  = \""+direction+"\"")
+	securityRule = append(securityRule, "  access                     = \""+access+"\"")
+	securityRule = append(securityRule, "  protocol                   = \""+protocol+"\"")
+	securityRule = append(securityRule, "  source_port_range          = \"*\"")
+	securityRule = append(securityRule, "  destination_port_range     = \""+port+"\"")
+	securityRule = append(securityRule, "  source_address_prefix      = \"*\"")
+	securityRule = append(securityRule, "  destination_address_prefix = \""+ip+"\" #tfsec:ignore:azure-network-no-public-egress")
+	securityRule = append(securityRule, "}")
+	return securityRule
+}
+
 func writeToFile(lines []string, filename string) {
 	file, err := os.Create(filename)
 	if err != nil {
@@ -176,4 +236,12 @@ func writeToFile(lines []string, filename string) {
 			fmt.Println("Error writing to file on disk")
 		}
 	}
+}
+
+func isIPv4(ip string) bool {
+	// Very naive function, but enough considering we know what the API returns
+	if strings.Count(ip, ".") == 3 {
+		return true
+	}
+	return false
 }
