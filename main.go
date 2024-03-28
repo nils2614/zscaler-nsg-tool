@@ -135,13 +135,31 @@ func appendHubRules(url string, priority *int) []string {
 	// Iterate over all IPs and append security rules for them (TCP and UDP)
 	var whitelistRules []string
 	fmt.Println("Rules are being generated for Zscaler Hub IPs")
+
+	//Generate destination address slice
+	var onlyIPv4 []string
 	for i := 0; i < len(result.HubPrefixes); i++ {
 		if isIPv4(result.HubPrefixes[i]) {
-			ruleName := "AllowZscaler-Hub" + "-" + strconv.Itoa(i+1)
-			whitelistRules = append(whitelistRules, generateSecurityRule(ruleName, *priority, "Outbound", "Allow", "*", "443", result.HubPrefixes[i])...)
-			*priority++
+			onlyIPv4 = append(onlyIPv4, result.HubPrefixes[i])
 		}
 	}
+
+	var destinations string
+	for i := 0; i < len(onlyIPv4); i++ {
+		if isIPv4(onlyIPv4[i]) {
+			//ruleName := "AllowZscaler-Hub" + "-" + strconv.Itoa(i+1)
+			//whitelistRules = append(whitelistRules, generateSecurityRule(ruleName, *priority, "Outbound", "Allow", "*", "443", result.HubPrefixes[i])...)
+			if i == 0 {
+				destinations = destinations + "[\"" + onlyIPv4[i] + "\""
+			} else if i == len(onlyIPv4)-1 {
+				destinations = destinations + ", \"" + onlyIPv4[i] + "\"]"
+			} else {
+				destinations = destinations + ", \"" + onlyIPv4[i] + "\""
+			}
+			//*priority++
+		}
+	}
+	fmt.Println(destinations)
 
 	return whitelistRules
 }
