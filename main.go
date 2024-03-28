@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pelletier/go-toml/v2"
 	"os"
+	"strconv"
 )
 
 // Struct to hold information from Zscaler API and config file
@@ -40,17 +41,17 @@ type (
 	}
 
 	cfgZscaler struct {
-		Zpa    cfgZscalerZpa
 		Hub    cfgZscalerHub
+		Zpa    cfgZscalerZpa
 		Custom cfgZscalerCustom
 	}
 
-	cfgZscalerZpa struct {
+	cfgZscalerHub struct {
 		Enabled bool
 		Url     string
 	}
 
-	cfgZscalerHub struct {
+	cfgZscalerZpa struct {
 		Enabled bool
 		Url     string
 	}
@@ -91,6 +92,7 @@ func main() {
 	outputVarsText = generateVarDefinition(cfg.Resources.NsgNameTf)
 
 	// Generate output for cfg.Main.OutputRules
+	fmt.Println("First priority: " + strconv.Itoa(cfg.Main.Priority))
 
 	// Write to output files
 	writeToFile(outputNsgText, cfg.Main.OutputNsg)

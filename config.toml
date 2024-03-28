@@ -4,13 +4,13 @@ outputNsg = "restrict_zscaler.tf"
 outputVars = "variables.tf"
 outputRules = "terraform.tfvars"
 
-[zscaler.zpa]
-enabled = true
-url = "https://api.config.zscaler.com/zscaler.net/zpa/json"
-
 [zscaler.hub]
 enabled = true
 url = "https://config.zscaler.com/api/zscaler.net/hubs/cidr/json/recommended"
+
+[zscaler.zpa]
+enabled = true
+url = "https://api.config.zscaler.com/zscaler.net/zpa/json"
 
 [zscaler.custom]
 enabled = false
