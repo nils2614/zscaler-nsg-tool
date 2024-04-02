@@ -133,15 +133,11 @@ func appendHubRules(url string, priority *int) []string {
 	}
 
 	// Iterate over all IPs and append security rules for them (TCP and UDP)
-	var whitelistRules []string
 	fmt.Println("Rules are being generated for Zscaler Hub IPs")
-
 	destinations := makeDestinationList(result.HubPrefixes)
+	outputRules := generateSecurityRule("Test", *priority, "Outbound", "Allow", "*", "443", destinations)
 
-	whitelistRules = generateSecurityRule("Test", *priority, "Outbound", "Allow", "*", "443", destinations)
-	fmt.Println(destinations)
-
-	return whitelistRules
+	return outputRules
 }
 
 func makeDestinationList(inputArray []string) string {
