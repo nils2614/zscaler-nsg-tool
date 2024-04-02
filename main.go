@@ -173,7 +173,7 @@ func appendZpaRules(url string, priority *int) []string {
 		destinations := makeDestinationList(result.Content[i].IPs)
 
 		ruleName := "AllowZscaler" + "-" + strconv.Itoa(i+1)
-		outputRules = generateSecurityRule(ruleName, *priority, "Outbound", "Allow", "*", "443", destinations)
+		outputRules = append(outputRules, generateSecurityRule(ruleName, *priority, "Outbound", "Allow", "*", "443", destinations)...)
 
 		*priority++
 	}
