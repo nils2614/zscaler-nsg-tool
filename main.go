@@ -101,6 +101,9 @@ func main() {
 	if cfg.Zscaler.Hub.Enabled {
 		outputRulesText = append(outputRulesText, appendHubRules(cfg.Zscaler.Hub.Url, &currentPrio)...)
 	}
+	if cfg.Zscaler.Zpa.Enabled {
+		outputRulesText = append(outputRulesText, appendZpaRules(cfg.Zscaler.Zpa.Url, &currentPrio)...)
+	}
 
 	// Write to output files
 	writeToFile(outputNsgText, cfg.Main.OutputNsg)
@@ -136,6 +139,44 @@ func appendHubRules(url string, priority *int) []string {
 	fmt.Println("Rules are being generated for Zscaler Hub IPs")
 	destinations := makeDestinationList(result.HubPrefixes)
 	outputRules := generateSecurityRule("Test", *priority, "Outbound", "Allow", "*", "443", destinations)
+	*priority++
+
+	return outputRules
+}
+
+func appendZpaRules(url string, priority *int) []string {
+	// Request data and store body in var.body
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println("No response from request")
+	}
+
+	// Close ReadAll of resp.Body
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("Error closing body of data request")
+		}
+	}(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+
+	// Unmarshal JSON from var.body to struct.result
+	var result zpaApi
+	if err := json.Unmarshal(body, &result); err != nil {
+		fmt.Println("Can not unmarshal JSON")
+	}
+
+	// Iterate over all IPs and append security rules for them (TCP and UDP)
+	var outputRules []string
+	for i := 0; i < len(result.Content); i++ {
+		fmt.Println("Rules are being generated for IP Block " + strconv.Itoa(i+1) + " (" + result.Content[i].DateAdded + ").")
+		destinations := makeDestinationList(result.Content[i].IPs)
+
+		ruleName := "AllowZscaler" + "-" + strconv.Itoa(i+1)
+		outputRules = generateSecurityRule(ruleName, *priority, "Outbound", "Allow", "*", "443", destinations)
+
+		*priority++
+	}
 
 	return outputRules
 }
