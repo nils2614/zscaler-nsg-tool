@@ -214,7 +214,9 @@ func makeDestinationList(inputArray []string) string {
 		if isIPv4(onlyIPv4[i]) {
 			//ruleName := "AllowZscaler-Hub" + "-" + strconv.Itoa(i+1)
 			//whitelistRules = append(whitelistRules, generateSecurityRule(ruleName, *priority, "Outbound", "Allow", "*", "443", result.HubPrefixes[i])...)
-			if i == 0 {
+			if 0 == len(onlyIPv4)-1 {
+				destinations = "[\"" + onlyIPv4[i] + "\"]"
+			} else if i == 0 {
 				destinations = destinations + "[\"" + onlyIPv4[i] + "\""
 			} else if i == len(onlyIPv4)-1 {
 				destinations = destinations + ", \"" + onlyIPv4[i] + "\"]"
