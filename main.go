@@ -108,6 +108,9 @@ func main() {
 		outputRulesText = append(outputRulesText, appendCustomRules(cfg.Zscaler.Custom.Ips, &currentPrio)...)
 	}
 
+	// Add commas in between the security rules
+	addTrailingCommas(outputRulesText)
+
 	// Write to output files
 	writeToFile(outputNsgText, cfg.Main.OutputNsg)
 	writeToFile(outputVarsText, cfg.Main.OutputVars)
@@ -324,4 +327,10 @@ func isIPv4(ip string) bool {
 		return true
 	}
 	return false
+}
+
+func addTrailingCommas(outputRules []string) {
+	for i := 10; i < len(outputRules)-11; i = i + 11 {
+		outputRules[i] = outputRules[i] + ","
+	}
 }
