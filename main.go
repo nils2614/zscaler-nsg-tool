@@ -138,7 +138,7 @@ func appendHubRules(url string, priority *int) []string {
 		fmt.Println("Can not unmarshal JSON")
 	}
 
-	// Iterate over all IPs and append security rules for them (TCP and UDP)
+	// Create destination string and generate security rules
 	fmt.Println("Rules are being generated for Zscaler Hub IPs")
 	destinations := makeDestinationList(result.HubPrefixes)
 	outputRules := generateSecurityRule("AllowZscaler-Hub", *priority, "Outbound", "Allow", "*", "443", destinations)
@@ -169,7 +169,7 @@ func appendZpaRules(url string, priority *int) []string {
 		fmt.Println("Can not unmarshal JSON")
 	}
 
-	// Iterate over all IPs and append security rules for them (TCP and UDP)
+	// Create destination string and generate security rules for each IP block
 	var outputRules []string
 	for i := 0; i < len(result.Content); i++ {
 		fmt.Println("Rules are being generated for IP Block " + strconv.Itoa(i+1) + " (" + result.Content[i].DateAdded + ").")
@@ -185,7 +185,7 @@ func appendZpaRules(url string, priority *int) []string {
 }
 
 func appendCustomRules(ips []string, priority *int) []string {
-	// Iterate over all IPs and append security rules for them (TCP and UDP)
+	// Create destination string and generate security rules
 	fmt.Println("Rules are being generated for " + strconv.Itoa(len(ips)) + " Custom IPs")
 	destinations := makeDestinationList(ips)
 	outputRules := generateSecurityRule("AllowZscaler-Custom", *priority, "Outbound", "Allow", "*", "443", destinations)
