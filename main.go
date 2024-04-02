@@ -104,6 +104,9 @@ func main() {
 	if cfg.Zscaler.Zpa.Enabled {
 		outputRulesText = append(outputRulesText, appendZpaRules(cfg.Zscaler.Zpa.Url, &currentPrio)...)
 	}
+	if cfg.Zscaler.Custom.Enabled {
+		outputRulesText = append(outputRulesText, appendCustomRules(cfg.Zscaler.Custom.Ips, &currentPrio)...)
+	}
 
 	// Write to output files
 	writeToFile(outputNsgText, cfg.Main.OutputNsg)
@@ -138,7 +141,7 @@ func appendHubRules(url string, priority *int) []string {
 	// Iterate over all IPs and append security rules for them (TCP and UDP)
 	fmt.Println("Rules are being generated for Zscaler Hub IPs")
 	destinations := makeDestinationList(result.HubPrefixes)
-	outputRules := generateSecurityRule("Test", *priority, "Outbound", "Allow", "*", "443", destinations)
+	outputRules := generateSecurityRule("AllowZscaler-Hub", *priority, "Outbound", "Allow", "*", "443", destinations)
 	*priority++
 
 	return outputRules
@@ -170,13 +173,23 @@ func appendZpaRules(url string, priority *int) []string {
 	var outputRules []string
 	for i := 0; i < len(result.Content); i++ {
 		fmt.Println("Rules are being generated for IP Block " + strconv.Itoa(i+1) + " (" + result.Content[i].DateAdded + ").")
-		destinations := makeDestinationList(result.Content[i].IPs)
+		ruleName := "AllowZscaler" + "-Zpa-" + strconv.Itoa(i+1)
 
-		ruleName := "AllowZscaler" + "-" + strconv.Itoa(i+1)
+		destinations := makeDestinationList(result.Content[i].IPs)
 		outputRules = append(outputRules, generateSecurityRule(ruleName, *priority, "Outbound", "Allow", "*", "443", destinations)...)
 
 		*priority++
 	}
+
+	return outputRules
+}
+
+func appendCustomRules(ips []string, priority *int) []string {
+	// Iterate over all IPs and append security rules for them (TCP and UDP)
+	fmt.Println("Rules are being generated for " + strconv.Itoa(len(ips)) + " Custom IPs")
+	destinations := makeDestinationList(ips)
+	outputRules := generateSecurityRule("AllowZscaler-Custom", *priority, "Outbound", "Allow", "*", "443", destinations)
+	*priority++
 
 	return outputRules
 }
