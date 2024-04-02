@@ -136,15 +136,27 @@ func appendHubRules(url string, priority *int) []string {
 	var whitelistRules []string
 	fmt.Println("Rules are being generated for Zscaler Hub IPs")
 
-	//Generate destination address slice
+	destinations := makeDestinationList(result.HubPrefixes)
+
+	whitelistRules = generateSecurityRule("Test", *priority, "Outbound", "Allow", "*", "443", destinations)
+	fmt.Println(destinations)
+
+	return whitelistRules
+}
+
+func makeDestinationList(inputArray []string) string {
+	// Generate destination address slice
 	var onlyIPv4 []string
-	for i := 0; i < len(result.HubPrefixes); i++ {
-		if isIPv4(result.HubPrefixes[i]) {
-			onlyIPv4 = append(onlyIPv4, result.HubPrefixes[i])
+	for i := 0; i < len(inputArray); i++ {
+		if isIPv4(inputArray[i]) {
+			onlyIPv4 = append(onlyIPv4, inputArray[i])
 		}
 	}
 
+	// Store final result
 	var destinations string
+
+	// Create String including all destinations
 	for i := 0; i < len(onlyIPv4); i++ {
 		if isIPv4(onlyIPv4[i]) {
 			//ruleName := "AllowZscaler-Hub" + "-" + strconv.Itoa(i+1)
@@ -159,10 +171,9 @@ func appendHubRules(url string, priority *int) []string {
 			//*priority++
 		}
 	}
-	whitelistRules = generateSecurityRule("Test", *priority, "Outbound", "Allow", "*", "443", destinations)
-	fmt.Println(destinations)
 
-	return whitelistRules
+	// Return magical string
+	return destinations
 }
 
 func generateNsgDefinition(rgNameTf string, nsgNameTf string, nsgNameAz string) []string {
