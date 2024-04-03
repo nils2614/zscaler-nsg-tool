@@ -19,4 +19,16 @@ resource "azurerm_network_security_group" "restrict_zscaler" {
     }
   }
 
+  security_rule {
+    name                       = "DenyInternetOutbound"
+    priority                   = 4001
+    direction                  = "Outbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "Internet"
+    }
+
 }
