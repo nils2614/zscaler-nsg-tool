@@ -279,7 +279,7 @@ func generateVarDefinition(nsgNameTf string) []string {
 	VarDefinition = append(VarDefinition, "    source_port_range            = string")
 	VarDefinition = append(VarDefinition, "    destination_port_range       = string")
 	VarDefinition = append(VarDefinition, "    source_address_prefix        = string")
-	VarDefinition = append(VarDefinition, "    destination_address_prefixes = list")
+	VarDefinition = append(VarDefinition, "    destination_address_prefixes = list(string)")
 	VarDefinition = append(VarDefinition, "  }))")
 	VarDefinition = append(VarDefinition, "  description = \"Security rules for the "+nsgNameTf+" NSG\"")
 	VarDefinition = append(VarDefinition, "}")
