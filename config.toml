@@ -5,7 +5,7 @@ outputVars = "variables.tf"
 outputRules = "terraform.tfvars"
 
 [zscaler.hub]
-enabled = false
+enabled = true
 url = "https://config.zscaler.com/api/zscaler.net/hubs/cidr/json/recommended"
 
 [zscaler.zpa]
@@ -13,9 +13,10 @@ enabled = true
 url = "https://api.config.zscaler.com/zscaler.net/zpa/json"
 
 [zscaler.custom]
-enabled = false
-ips = [ "30.80.175.75", "54.187.114.244", "54.149.72.202", "185.46.212.0/22", "104.129.192.0/20", "165.225.0.0/17",
-    "165.225.192.0/18", "147.161.128.0/17", "136.226.0.0/16", "137.83.128.0/18", "167.103.0.0/16", "170.85.0.0/16" ]
+enabled = true
+ips = [ "30.80.175.75", "54.149.72.202", "54.187.114.244", "104.129.192.0/20",
+    "136.226.0.0/16", "137.83.128.0/18", "147.161.128.0/17", "165.225.0.0/17",
+    "165.225.192.0/18", "167.103.0.0/16", "170.85.0.0/16", "185.46.212.0/22" ]
 
 [resources]
 rgNameTf = "playground"
