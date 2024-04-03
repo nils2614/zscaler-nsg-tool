@@ -87,7 +87,10 @@ func main() {
 	}
 
 	if cfg.Main.Priority > 3800 {
-		fmt.Fprintf(os.Stderr, "Error: Priority can't be larger than 3800 to avoid collusions")
+		_, err := fmt.Fprintf(os.Stderr, "Error: Priority can't be larger than 3800 to avoid collusions")
+		if err != nil {
+			return
+		}
 		os.Exit(1)
 	}
 
