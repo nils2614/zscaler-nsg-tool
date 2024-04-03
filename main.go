@@ -86,6 +86,11 @@ func main() {
 		}
 	}
 
+	if cfg.Main.Priority > 3800 {
+		fmt.Fprintf(os.Stderr, "Error: Priority can't be larger than 3800 to avoid collusions")
+		os.Exit(1)
+	}
+
 	// Initialise slices to hold the output text
 	var outputNsgText []string   // holds content for file cfg.Main.OutputNsg
 	var outputVarsText []string  // holds content for file cfg.Main.OutputVars
